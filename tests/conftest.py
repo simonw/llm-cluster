@@ -7,25 +7,35 @@ class LengthSummary(llm.Model):
     model_id = "length-summary"
 
     def execute(self, prompt, stream, response, conversation):
-        self.last_prompt = prompt
         return ["Length: {}".format(len(prompt.prompt))]
 
 
-@pytest.fixture
-def length_summary():
-    return LengthSummary()
+class SimpleEmbeddings(llm.EmbeddingModel):
+    model_id = "simple-embeddings"
+
+    def embed_batch(self, texts):
+        for text in texts:
+            words = text.split()[:16]
+            embedding = [len(word) for word in words]
+            # Pad with 0 up to 16 words
+            embedding += [0] * (16 - len(embedding))
+            yield embedding
 
 
 @pytest.fixture(autouse=True)
-def register_embed_demo_model(length_summary):
-    class LengthSummaryPlugin:
-        __name__ = "LengthSummaryPlugin"
+def register_models():
+    class ModelsPlugin:
+        __name__ = "ModelsPlugin"
 
         @llm.hookimpl
         def register_models(self, register):
-            register(length_summary)
+            register(LengthSummary())
 
-    pm.register(LengthSummaryPlugin(), name="undo-demo-plugin")
+        @llm.hookimpl
+        def register_embedding_models(self, register):
+            register(SimpleEmbeddings())
+
+    pm.register(ModelsPlugin(), name="undo-demo-plugin")
     try:
         yield
     finally:

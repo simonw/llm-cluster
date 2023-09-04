@@ -23,4 +23,4 @@ CI = "https://github.com/simonw/llm-cluster/actions"
 cluster = "llm_cluster"
 
 [project.optional-dependencies]
-test = ["pytest", "llm-sentence-transformers"]
+test = ["pytest"]

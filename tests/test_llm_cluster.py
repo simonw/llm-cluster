@@ -1,7 +1,6 @@
 from click.testing import CliRunner
 import json
 from llm.cli import cli
-from llm_sentence_transformers import SentenceTransformerModel
 import llm
 import pytest
 import sqlite_utils
@@ -11,15 +10,12 @@ import sqlite_utils
 def db_path(tmpdir):
     db_path = tmpdir / "data.db"
     db = sqlite_utils.Database(str(db_path))
-    embed_model = SentenceTransformerModel(
-        "sentence-transformers/all-MiniLM-L6-v2", "all-MiniLM-L6-v2"
-    )
-    collection = llm.Collection("entries", db, model=embed_model)
+    collection = llm.Collection("entries", db, model_id="simple-embeddings")
     collection.embed_multi(
         [
-            (1, "hello world"),
-            (2, "goodbye world"),
-            (3, "third thing"),
+            (1, "one word"),
+            (2, "two words"),
+            (3, "three thing"),
             (4, "fourth thing"),
             (5, "fifth thing"),
             (6, "sixth thing"),
@@ -33,7 +29,7 @@ def db_path(tmpdir):
     return db_path
 
 
-@pytest.mark.parametrize("n", (2, 5))
+@pytest.mark.parametrize("n", (2, 3))
 def test_cluster(db_path, n):
     db = sqlite_utils.Database(str(db_path))
     assert db["embeddings"].count == 10
