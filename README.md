@@ -5,7 +5,9 @@
 [![Tests](https://github.com/simonw/llm-cluster/workflows/Test/badge.svg)](https://github.com/simonw/llm-cluster/actions?query=workflow%3ATest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/llm-cluster/blob/main/LICENSE)
 
-[LLM](https://llm.datasette.io/) plugin for clustering embeddings.
+[LLM](https://llm.datasette.io/) plugin for clustering embeddings
+
+Background on this project: [Clustering with llm-cluster](https://simonwillison.net/2023/Sep/4/llm-embeddings/#llm-cluster).
 
 ## Installation
 
