@@ -27,7 +27,8 @@ def db_path(tmpdir):
             (8, "eighth thing"),
             (9, "ninth thing"),
             (10, "tenth thing"),
-        ]
+        ],
+        store=True,
     )
     return db_path
 
@@ -53,3 +54,31 @@ def test_cluster(db_path, n):
     for cluster in clusters:
         assert isinstance(cluster["id"], str)
         assert isinstance(cluster["items"], list)
+
+
+@pytest.mark.parametrize("content_available", (True, False))
+def test_cluster_summary(db_path, content_available):
+    db = sqlite_utils.Database(str(db_path))
+    if not content_available:
+        with db.conn:
+            db.execute("update embeddings set content = null")
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "cluster",
+            "entries",
+            "--database",
+            str(db_path),
+            "4",
+            "--summary",
+            "--model",
+            "length-summary",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    clusters = json.loads(result.output)
+    if content_available:
+        assert all(cluster["summary"].startswith("Length: ") for cluster in clusters)
+    else:
+        assert all(cluster["summary"] is None for cluster in clusters)
