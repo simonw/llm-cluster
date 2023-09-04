@@ -1,0 +1,26 @@
+[project]
+name = "llm-cluster"
+version = "0.1"
+description = "LLM plugin for clustering embeddings"
+readme = "README.md"
+authors = [{name = "Simon Willison"}]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License"
+]
+dependencies = [
+    "llm>=0.9",
+    "scikit-learn"
+]
+
+[project.urls]
+Homepage = "https://github.com/simonw/llm-cluster"
+Changelog = "https://github.com/simonw/llm-cluster/releases"
+Issues = "https://github.com/simonw/llm-cluster/issues"
+CI = "https://github.com/simonw/llm-cluster/actions"
+
+[project.entry-points.llm]
+cluster = "llm_cluster"
+
+[project.optional-dependencies]
+test = ["pytest", "llm-sentence-transformers"]
