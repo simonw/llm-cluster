@@ -17,19 +17,26 @@ def register_commands(cli):
     @click.argument("collection")
     @click.argument("n", type=int)
     @click.option(
+        "--truncate",
+        type=int,
+        default=100,
+        help="Truncate content to this many characters - 0 for no truncation",
+    )
+    @click.option(
         "-d",
         "--database",
         type=click.Path(
             file_okay=True, allow_dash=False, dir_okay=False, writable=True
         ),
         envvar="LLM_EMBEDDINGS_DB",
+        help="SQLite database file containing embeddings",
     )
     @click.option(
         "--summary", is_flag=True, help="Generate summary title for each cluster"
     )
     @click.option("-m", "--model", help="LLM model to use for the summary")
     @click.option("--prompt", help="Custom prompt to use for the summary")
-    def cluster(collection, n, database, summary, model, prompt):
+    def cluster(collection, n, truncate, database, summary, model, prompt):
         """
         Generate clusters from embeddings in a collection
 
@@ -65,14 +72,20 @@ def register_commands(cli):
         to_cluster = np.array([item[1] for item in rows])
         clustering_model.fit(to_cluster)
         assignments = clustering_model.labels_
+
+        def truncate_text(text):
+            if not text:
+                return None
+            if truncate > 0:
+                return text[:truncate]
+            else:
+                return text
+
         # Each one corresponds to an ID
         clusters = {}
         for (id, _, content), cluster in zip(rows, assignments):
             clusters.setdefault(str(cluster), []).append(
-                {
-                    "id": str(id),
-                    "content": content[:100] if content else None,
-                }
+                {"id": str(id), "content": truncate_text(content)}
             )
         # Re-arrange into a list
         output_clusters = [{"id": k, "items": v} for k, v in clusters.items()]
