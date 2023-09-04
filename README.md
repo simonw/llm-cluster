@@ -107,6 +107,44 @@ llm cluster llm-issues 10 \
 ```
 This uses the default prompt and the default model.
 
+Partial example output:
+```json
+[
+  {
+    "id": "5",
+    "items": [
+      {
+        "id": "1650682379",
+        "content": "Log prompts and responses to SQLite"
+      },
+      {
+        "id": "1650757081",
+        "content": "Command for browsing captured logs"
+      }
+    ],
+    "summary": "Log Management and Interactive Prompt Tracking"
+  },
+  {
+    "id": "6",
+    "items": [
+      {
+        "id": "1650771320",
+        "content": "Mechanism for continuing an existing conversation"
+      },
+      {
+        "id": "1740090291",
+        "content": "-c option for continuing a chat (using new chat_id column)"
+      },
+      {
+        "id": "1784122278",
+        "content": "Figure out truncation strategy for continue conversation mode"
+      }
+    ],
+    "summary": "Continuing Conversation Mechanism and Management"
+  }
+]
+```
+
 To use a different model, e.g. GPT-4, pass the `--model` option:
 ```bash
 llm cluster llm-issues 10 \
