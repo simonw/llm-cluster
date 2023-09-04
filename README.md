@@ -86,15 +86,17 @@ The output should look something like this (truncated):
   }
 ]
 ```
+The content displayed is truncated to 100 characters. Pass `--truncate 0` to disable truncation, or `--truncate X` to truncate to X characters.
+
 ## Generating summaries for each cluster
 
-The `--summary` flag will cause the plugin to generate a summary for each cluster, by passing the first 100 characters of stored content through a prompt to a Large Language Model.
+The `--summary` flag will cause the plugin to generate a summary for each cluster, by passing the content of the items (truncated according to the `--truncate` option) through a prompt to a Large Language Model.
 
 This feature is still experimental. You should experiment with custom prompts to improve the quality of your summaries.
 
-Since it can result in running a large amount of text through a LLM it can also be expensive, depending on which model you are using.
+Since this can run a large amount of text through a LLM this can be expensive, depending on which model you are using.
 
-This only works against embeddings that have had their associated content stored in the database using the `--store` flag.
+This feature only works for embeddings that have had their associated content stored in the database using the `--store` flag.
 
 You can use it like this:
 
@@ -112,6 +114,10 @@ llm cluster llm-issues 10 \
   --summary \
   --model gpt-4
 ```
+The default prompt used is:
+
+> Short, concise title for this cluster of related documents.
+
 To use a custom prompt, pass `--prompt`:
 
 ```bash
