@@ -23,6 +23,15 @@ def register_commands(cli):
         help="Truncate content to this many characters - 0 for no truncation",
     )
     @click.option(
+        "-w",
+        "--wordlimit",
+        type=int,
+        default=10_000,
+        help="""Approximate limit on the number of words in items collected from the cluster - 0 for no limit.
+        Default of 10,000 should work for GPT-3.5-turbo-16k models. Items up to this limit are collected.
+        """,
+    )
+    @click.option(
         "-d",
         "--database",
         type=click.Path(
@@ -36,7 +45,7 @@ def register_commands(cli):
     )
     @click.option("-m", "--model", help="LLM model to use for the summary")
     @click.option("--prompt", help="Custom prompt to use for the summary")
-    def cluster(collection, n, truncate, database, summary, model, prompt):
+    def cluster(collection, n, truncate, wordlimit, database, summary, model, prompt):
         """
         Generate clusters from embeddings in a collection
 
@@ -109,9 +118,19 @@ def register_commands(cli):
                     ).lstrip()
                     + ","
                 )
-                prompt_content = "\n".join(
-                    [item["content"] for item in cluster["items"] if item["content"]]
-                )
+#                prompt_content = "\n".join(
+#                    [item["content"] for item in cluster["items"] if item["content"]]
+#                )
+                #   ------  Limit the input to what a model can handle  ------
+                contents = []
+                total_words = 0
+                for item in cluster["items"]:
+                    if item["content"]:
+                        words = len(item["content"].split())
+                        if wordlimit == 0 or total_words + words < wordlimit:
+                            contents.append(item["content"])
+                            total_words += words
+                prompt_content = "\n".join(contents)
                 if prompt_content.strip():
                     summary = model.prompt(
                         prompt_content,
